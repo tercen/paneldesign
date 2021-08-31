@@ -25,11 +25,12 @@ mf_combs <- read.delim(mf_combs_filename)
 source("R/rscore_functions.R")
 score_list <- vector("numeric", nrow(mf_combs))
 for (i in 1:nrow(mf_combs)) {
-  score_list[i] <- calculate_score(mf_combs[i,])
+  score_list[i] <- calculate_score(mf_combs[i, ])
 }
 
 score_result <- data.frame(mf_combs, score_list)
 
+# initialize empty dataframes
 bruteforce_df = data.frame(
   c1a = integer(),
   c1b = integer(),
@@ -49,9 +50,9 @@ scores_df = data.frame(
 # look for all possible combinations
 for (i in 1:nrow(score_result)) {
   # first combination is our starting point
-  c1a = score_result[i,]$mfcomb1
-  c1b = score_result[i,]$mfcomb2
-  c1s = score_result[i,]$score_list
+  c1a = score_result[i, ]$mfcomb1
+  c1b = score_result[i, ]$mfcomb2
+  c1s = score_result[i, ]$score_list
   
   # find combinations which also include C1,
   # with exception of its own
@@ -60,9 +61,9 @@ for (i in 1:nrow(score_result)) {
     filter(mfcomb1 == c1a | mfcomb2 == c1a)
   
   for (i in 1:nrow(mf_combs_c1)) {
-    c2a = mf_combs_c1[i,]$mfcomb1
-    c2b = mf_combs_c1[i,]$mfcomb2
-    c2s = mf_combs_c1[i,]$score_list
+    c2a = mf_combs_c1[i, ]$mfcomb1
+    c2b = mf_combs_c1[i, ]$mfcomb2
+    c2s = mf_combs_c1[i, ]$score_list
     
     comb = c(c1a, c1b, c2a, c2b)
     comb_unique = comb[!(comb %in% comb[duplicated(comb)])]
@@ -79,23 +80,23 @@ for (i in 1:nrow(score_result)) {
     }
     
     for (i in 1:nrow(mf_combs_c2)) {
-      c3a = mf_combs_c2[i,]$mfcomb1
-      c3b = mf_combs_c2[i,]$mfcomb2
-      c3s = mf_combs_c2[i,]$score_list
+      c3a = mf_combs_c2[i, ]$mfcomb1
+      c3b = mf_combs_c2[i, ]$mfcomb2
+      c3s = mf_combs_c2[i, ]$score_list
       
       comb = c(c1a, c1b, c2a, c2b, c3a, c3b)
       scores = c(c1s, c2s, c3s)
-    
-      bruteforce_df[nrow(bruteforce_df) + 1, ] = comb
-      scores_df[nrow(scores_df) + 1, ] = c(scores, prod(scores))
+      
+      bruteforce_df[nrow(bruteforce_df) + 1,] = comb
+      scores_df[nrow(scores_df) + 1,] = c(scores, prod(scores))
       
     }
     
   }
 }
 
-bruteforce_df = bruteforce_df[!duplicated(bruteforce_df), ]
-scores_df = scores_df[!duplicated(scores_df), ]
+bruteforce_df = bruteforce_df[!duplicated(bruteforce_df),]
+scores_df = scores_df[!duplicated(scores_df),]
 
 # generate output files
 write.table(
@@ -115,11 +116,10 @@ write.table(
 # generate plots
 source("R/plot_rscore_comb.R")
 for (i in 1:nrow(bruteforce_df)) {
-  combs = as.character(bruteforce_df[i, ])
-  scores = as.numeric(scores_df[i, ])
+  combs = as.character(bruteforce_df[i,])
+  scores = as.numeric(scores_df[i,])
   fname = file.path("output", "bruteforce", "plots_3d",
                     paste0(i, ".png"))
   
   save_and_plot_rscore_combination(combs, scores, fname)
 }
-  
